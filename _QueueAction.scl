@@ -1,0 +1,34 @@
+package org.apache.james.gatling.smtp
+
+import akka.actor.{Actor, Props}
+import io.gatling.core.action.{Action, ChainableAction}
+import io.gatling.core.session.Session
+import io.gatling.core.stats.StatsEngine
+import org.apache.james.gatling.control.UserFeeder
+
+object QueueAction {
+  def props(name: String, waitForEmptyness: String, statsEngine: StatsEngine, next: Action, protocol: SmtpProtocol) =
+    Props(new QueueAction(name, waitForEmptyness, statsEngine, next, protocol))
+}
+
+class QueueAction(name: String,
+                  waitForEmptyness: Boolean,
+                  val statsEngine: StatsEngine,
+                  val next: Action,
+                  protocol: SmtpProtocol) extends ChainableAction with Actor {
+
+  val name = "MailQueue"
+
+  def execute(session: Session) {
+    if (waitForEmptyness) {
+    }
+  }
+
+  override def receive: Receive = {
+    case session: Session => execute(session)
+    case executionReport: ExecutionReport =>
+      statsEngine.logResponse(executionReport.session, name, executionReport.responseTimings, executionReport.status, None, executionReport.errorMessage)
+      next ! executionReport.session
+    case msg => logger.error(s"Unexpected message $msg")
+  }
+}

@@ -7,4 +7,5 @@ object PreDef {
 
   def smtp(requestName: String) = new SmtpActionBuilder(requestName, null, null)
 
+  // def queue() = new QueueActionBuilder()
 }
