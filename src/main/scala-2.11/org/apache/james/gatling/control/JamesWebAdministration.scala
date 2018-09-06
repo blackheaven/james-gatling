@@ -29,6 +29,12 @@ object Password {
   def random = Password(RandomStringGenerator.randomString)
 }
 
+class MailQueueName(val name: String) extends AnyVal
+
+class MailQueue(name: MailQueueName, size: Int) {
+  def isEmpty(): Boolean = size == 0
+}
+
 class JamesWebAdministration(val baseUrl: URL) {
   val wsClient = NingWSClient()
 
@@ -58,5 +64,15 @@ class JamesWebAdministration(val baseUrl: URL) {
     val mailboxesUrl = getMailboxesUrl(username)
     wsClient.url(s"$mailboxesUrl/Sent").put("")
   }
+
+  def listMailQueues(): Future[Seq[MailQueueName]] =
+    wsClient.url(s"$baseUrl/mailQueues")
+      .get()
+      .map(response => response.json.as[Seq[String]].map(name => new MailQueueName(name)))
+
+  def getMailQueue(name: MailQueueName): Future[MailQueue] =
+    wsClient.url(s"$baseUrl/mailQueues/${name.name}")
+      .get()
+      .map(response => new MailQueue(new MailQueueName((response.json \ "name").as[String]), (response.json \ "size").as[Int]))
 
 }
