@@ -20,7 +20,7 @@ object Configuration {
   val WEBADMIN_PROTOCOL = Properties.envOrElse("WEBADMIN_PROTOCOL", "http")
   val BaseJamesWebAdministrationUrl = new URL(s"$WEBADMIN_PROTOCOL://$WebadminServerHostName:$WEBADMIN_PORT")
 
-  val ScenarioDuration = 3 hours
+  val ScenarioDuration = 1 hours
   val UserCount = 1000
   val RandomlySentMails = 10
   val NumberOfMailboxes = 10
